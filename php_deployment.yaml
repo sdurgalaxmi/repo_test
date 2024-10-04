@@ -21,7 +21,52 @@ spec:
         - containerPort: 9000
         env:
         - name: DB_HOST
-          value: "postgres"  # Service name of PostgreSQL
+          value: "apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  labels:
+    app: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:13  # Specify the desired version of PostgreSQL
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_USER
+          value: "demo2"  # Replace with your desired username
+        - name: POSTGRES_PASSWORD
+          value: "demo2"  # Replace with your desired password
+        - name: POSTGRES_DB
+          value: "demo2db"  # Replace with your desired database name
+        volumeMounts:
+        - name: postgres-storage
+          mountPath: /var/lib/postgresql/data  # Default data directory
+      volumes:
+      - name: postgres-storage
+        persistentVolumeClaim:
+          claimName: postgres-pvc  # Reference to the PVC
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi  # Adjust storage size as needed"  # Service name of PostgreSQL
         - name: DB_USER
           value: "user"      # PostgreSQL user
         - name: DB_PASSWORD
