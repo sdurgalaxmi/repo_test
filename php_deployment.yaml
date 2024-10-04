@@ -31,10 +31,16 @@ spec:
         volumeMounts:
         - name: php-storage
           mountPath: /var/www/html/my-php-app
+        - name: php-config
+          mountPath: /var/www/html/my-php-app/index.php
+          subPath: index.php
       volumes:
       - name: php-storage
         persistentVolumeClaim:
           claimName: php-pvc  # Reference to a PVC for the PHP application
+      - name: php-config
+        configMap:
+          name: php-app-config
 
 ---
 apiVersion: v1
