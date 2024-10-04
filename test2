@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: php-app
+  labels:
+    app: php-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: php-app
+  template:
+    metadata:
+      labels:
+        app: php-app
+    spec:
+      containers:
+      - name: php
+        image: php:8.1-apache  # Use the desired PHP version
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: php-storage
+          mountPath: /var/www/html/my-php-app
+        - name: php-config
+          mountPath: /var/www/html/my-php-app/index.php
+          subPath: index.php
+      volumes:
+      - name: php-storage
+        persistentVolumeClaim:
+          claimName: php-pvc  # Reference to a PVC for the PHP application
+      - name: php-config
+        ConfigMap:
+          name: php-app-config
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: php-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data/php" # Path on the host node
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: php-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi  # Adjust storage size as needed
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: php-service
+spec:
+  type: NodePort  # Change the service type to NodePort
+  ports:
+    - port: 80
+      targetPort: 9000
+      nodePort: 31000  # Optional: Specify a custom NodePort, or let Kubernetes assign one
+  selector:
+    app: php-app
