@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: php-app
+  labels:
+    app: php-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: php-app
+  template:
+    metadata:
+      labels:
+        app: php-app
+    spec:
+      containers:
+      - name: php
+        image: php:8.0-fpm  # Use the desired PHP version
+        ports:
+        - containerPort: 9000
+        env:
+        - name: DB_HOST
+          value: "postgres"  # Service name of PostgreSQL
+        - name: DB_USER
+          value: "user"      # PostgreSQL user
+        - name: DB_PASSWORD
+          value: "password"  # PostgreSQL password
+        - name: DB_NAME
+          value: "dbname"    # PostgreSQL database name
+        volumeMounts:
+        - name: php-storage
+          mountPath: /var/www/html/my-php-app
+      volumes:
+      - name: php-storage
+        persistentVolumeClaim:
+          claimName: php-pvc  # Reference to a PVC for the PHP application
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: php-service
+spec:
+  type: NodePort  # Change the service type to NodePort
+  ports:
+    - port: 9000
+      targetPort: 9000
+      nodePort: 30000  # Optional: Specify a custom NodePort, or let Kubernetes assign one
+  selector:
+    app: php-app
