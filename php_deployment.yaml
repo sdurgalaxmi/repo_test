@@ -35,6 +35,19 @@ spec:
       - name: php-storage
         persistentVolumeClaim:
           claimName: php-pvc  # Reference to a PVC for the PHP application
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: php-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi  # Adjust storage size as needed
+
 ---
 apiVersion: v1
 kind: Service
