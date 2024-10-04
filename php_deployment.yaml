@@ -39,7 +39,7 @@ spec:
         persistentVolumeClaim:
           claimName: php-pvc  # Reference to a PVC for the PHP application
       - name: php-config
-        configMap:
+        ConfigMap:
           name: php-app-config
 
 ---
