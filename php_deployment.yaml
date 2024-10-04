@@ -44,6 +44,18 @@ spec:
 
 ---
 apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: php-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data/php" # Path on the host node
+---
+apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: php-pvc
