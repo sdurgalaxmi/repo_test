@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: php-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: php-app
+  template:
+    metadata:
+      labels:
+        app: php-app
+    spec:
+      containers:
+        - name: php-app
+          image: php:8.1-apache
+          ports:
+            - containerPort: 9000
+          volumeMounts:
+            - name: php-storage
+              mountPath: /var/www/html
+              subPath: index.php  # Ensure the main file is accessible
+      volumes:
+        - name: php-storage
+          persistentVolumeClaim:
+            claimName: php-pvc  # Reference to a PVC for the PHP application
+        - name: php-config
+          configMap:
+            name: php-config  # Reference the ConfigMap here
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: php-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data/php" # Path on the host node
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: php-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi  # Adjust storage size as needed
