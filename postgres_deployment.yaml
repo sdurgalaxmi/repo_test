@@ -20,6 +20,8 @@ spec:
         ports:
         - containerPort: 5432
         env:
+        - name: DB_HOST
+          value: "demopostgres"  # Service name of PostgreSQL
         - name: POSTGRES_USER
           value: "demo2"  # Replace with your desired username
         - name: POSTGRES_PASSWORD
